@@ -863,6 +863,14 @@ public abstract class BaseDataSource implements CommonDataSource, Referenceable 
     PGProperty.STRING_TYPE.set(properties, stringType);
   }
 
+  public boolean getLobVarlena() {
+    return PGProperty.LOB_VARLENA.getBoolean(properties);
+  }
+
+  public void setLobVarlena(boolean useVarlena) {
+    PGProperty.LOB_VARLENA.set(properties, useVarlena);
+  }
+
   /**
    * @return true if column sanitizer is disabled
    * @see PGProperty#DISABLE_COLUMN_SANITISER
