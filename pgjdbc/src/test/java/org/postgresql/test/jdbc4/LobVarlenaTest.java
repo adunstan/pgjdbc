@@ -6,6 +6,7 @@
 package org.postgresql.test.jdbc4;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.postgresql.PGProperty;
 import org.postgresql.jdbc.PgBlobBytea;
@@ -63,17 +64,17 @@ public class LobVarlenaTest {
   public void testConnClob() throws SQLException {
     // test we can get a clob from the connection and do basic set, get,
     // and search operations on it
-    assertEquals("Connection has clobAsText enabled", ((PgConnection)conn).getClobAsText(), true);
+    assertTrue("Connection has clobAsText enabled", ((PgConnection)conn).getClobAsText());
     Clob clob = conn.createClob();
-    assertEquals("Successfully create a Clob", clob instanceof PgClobText, true);
+    assertTrue("Successfully create a Clob", clob instanceof PgClobText);
     assertEquals("Length of Clob is 0", clob.length(), 0);
     clob.setString(1,"foobarbaz");
     assertEquals("Clob length is 9", clob.length(), 9);
-    assertEquals("Clob text is 'foobarbaz'", clob.toString().equals("foobarbaz"), true);
+    assertTrue("Clob text is 'foobarbaz'", clob.toString().equals("foobarbaz"));
     String s = clob.getSubString(4,3);
-    assertEquals("Fetched substring is 'bar'", s.equals("bar"), true);
+    assertTrue("Fetched substring is 'bar'", s.equals("bar"));
     String s2 = clob.getSubString(7,99);
-    assertEquals("Fetched substring is 'baz'", s2.equals("baz"), true);
+    assertTrue("Fetched substring is 'baz'", s2.equals("baz"));
     long pos = clob.position("bar",1);
     assertEquals("Found 'bar' at position 4 starting at 1", pos, 4);
     pos = clob.position("bar",4);
@@ -95,7 +96,7 @@ public class LobVarlenaTest {
     clob.truncate(3);
     assertEquals("Truncated clob length is 3", clob.length(), 3);
     String s3 = clob.toString();
-    assertEquals("Truncated clob value is 'foo'", s3.equals("foo"), true);
+    assertTrue("Truncated clob value is 'foo'", s3.equals("foo"));
   }
 
   @Test
@@ -104,10 +105,10 @@ public class LobVarlenaTest {
     Statement stmt = conn.createStatement();
     ResultSet rs = stmt.executeQuery(TestUtil.selectSQL("testlobvarlena", "textcol"));
     try {
-      assertEquals("Connection has getClobAsText", ((PgConnection)conn).getClobAsText(), true);
-      assertEquals("Result set has a row", rs.next(), true);
+      assertTrue("Connection has getClobAsText", ((PgConnection)conn).getClobAsText());
+      assertTrue("Result set has a row", rs.next());
       Clob clob = rs.getClob(1);
-      assertEquals("rs.getClob(1) returns a PgClobText", clob instanceof PgClobText, true);
+      assertTrue("rs.getClob(1) returns a PgClobText", clob instanceof PgClobText);
     } finally {
       rs.close();
     }
@@ -143,7 +144,7 @@ public class LobVarlenaTest {
       }
       w.close();
       String cs = clob.toString();
-      assertEquals("Clob contents = character stream", cs.equals(w.toString()), true);
+      assertTrue("Clob contents = character stream", cs.equals(w.toString()));
       r = clob.getCharacterStream(100,20);
       w = new StringWriter(300);
       while ((i = r.read()) != -1) {
@@ -152,7 +153,7 @@ public class LobVarlenaTest {
       w.close();
       String cs2 = clob.getSubString(100,20);
       String ws = w.toString();
-      assertEquals("Clob substring = character stream substring", cs2.equals(ws), true);
+      assertTrue("Clob substring = character stream substring", cs2.equals(ws));
       char[] buffer  = new char[(int)clob.length()];
       InputStream is = clob.getAsciiStream();
       int index = 0;
@@ -162,7 +163,7 @@ public class LobVarlenaTest {
         c = is.read();
       }
       String as = new String(buffer);
-      assertEquals("Ascii stream equals clob contents", as.equals(cs), true);
+      assertTrue("Ascii stream equals clob contents", as.equals(cs));
     } finally {
       rs.close();
     }
@@ -184,7 +185,7 @@ public class LobVarlenaTest {
       os.write("bazBarfoo".getBytes());
       assertEquals("Length grown by 9", clob.length(), origLen + 9);
       String end = clob.getSubString(origLen - 4, 999);
-      assertEquals("Stream has written bytes correctly", end.equals("blurfbazBarfoo"), true);
+      assertTrue("Stream has written bytes correctly", end.equals("blurfbazBarfoo"));
       clob.truncate(origLen);
       Writer w = clob.setCharacterStream(origLen - 4);
       w.write("Blurfl", 0, 5);
@@ -192,7 +193,7 @@ public class LobVarlenaTest {
       w.write("BazBarfoo", 0, 9);
       assertEquals("Length grown by 9", clob.length(), origLen + 9);
       end = clob.getSubString(origLen - 4, 999);
-      assertEquals("Stream has written bytes correctly", end.equals("BlurfBazBarfoo"), true);
+      assertTrue("Stream has written bytes correctly", end.equals("BlurfBazBarfoo"));
     } finally {
       rs.close();
     }
@@ -207,18 +208,18 @@ public class LobVarlenaTest {
     byte[] bar = "bar".getBytes();
     byte[] baz = "baz".getBytes();
     byte[] blurfl = "blurfl".getBytes();
-    assertEquals("Connection has blobAsBytea", ((PgConnection)conn).getBlobAsBytea(), true);
+    assertTrue("Connection has blobAsBytea", ((PgConnection)conn).getBlobAsBytea());
     Blob blob = conn.createBlob();
     assertEquals("PgBlobBytea created", blob instanceof PgBlobBytea, true);
     assertEquals("Initial blob has length 0", blob.length(),  0);
     blob.setBytes(1,foobarbaz);
     assertEquals("Blob has length 9", blob.length(), 9);
-    assertEquals("Blob has contents 'foobarbaz'", Arrays.equals(blob.getBytes(1,999),foobarbaz), true);
+    assertTrue("Blob has contents 'foobarbaz'", Arrays.equals(blob.getBytes(1,999),foobarbaz));
     byte[] s = blob.getBytes(4,3);
-    assertEquals("blob subcontents = 'bar'", Arrays.equals(s,bar), true);
+    assertTrue("blob subcontents = 'bar'", Arrays.equals(s,bar));
     byte[] s2 = blob.getBytes(7,99);
     assertEquals("blob remaining contents have length 3", s2.length, 3);
-    assertEquals("blob remaining contents = 'baz'", Arrays.equals(s2,baz), true);
+    assertTrue("blob remaining contents = 'baz'", Arrays.equals(s2,baz));
     long pos = blob.position(bar,1);
     assertEquals("blob position of 'bar' starting at 1 is 4", pos, 4);
     pos = blob.position(bar,4);
@@ -239,7 +240,7 @@ public class LobVarlenaTest {
     assertEquals("blob 'blurfl' not found in blob", pos, -1);
     blob.truncate(3);
     assertEquals("truncated blob length = 3", blob.length(), 3);
-    assertEquals("truncated blob contents = 'foo'", Arrays.equals(blob.getBytes(1,999),foo), true);
+    assertTrue("truncated blob contents = 'foo'", Arrays.equals(blob.getBytes(1,999),foo));
   }
 
   @Test
@@ -248,10 +249,10 @@ public class LobVarlenaTest {
     Statement stmt = conn.createStatement();
     ResultSet rs = stmt.executeQuery(TestUtil.selectSQL("testlobvarlena", "byteacol"));
     try {
-      assertEquals("Connection has blobAsText", ((PgConnection)conn).getBlobAsBytea(), true);
-      assertEquals("Result set has a row", rs.next(), true);
+      assertTrue("Connection has blobAsText", ((PgConnection)conn).getBlobAsBytea());
+      assertTrue("Result set has a row", rs.next());
       Blob blob = rs.getBlob(1);
-      assertEquals("returned result is a PgBlobBytea", blob instanceof PgBlobBytea, true);
+      assertTrue("returned result is a PgBlobBytea", blob instanceof PgBlobBytea);
     } finally {
       rs.close();
     }
@@ -291,7 +292,7 @@ public class LobVarlenaTest {
         c = is.read();
       }
       assertEquals("Input stream from blob has corrrect length", index, b.length);
-      assertEquals("Input stream from blob has correct contents", Arrays.equals(b,buffer), true);
+      assertTrue("Input stream from blob has correct contents", Arrays.equals(b,buffer));
     } finally {
       rs.close();
     }
@@ -313,7 +314,7 @@ public class LobVarlenaTest {
       os.write("bazBarfoo".getBytes());
       assertEquals("Length grown by 9", blob.length(), origLen + 9);
       byte[] end = blob.getBytes(origLen - 4, 999);
-      assertEquals("Stream has written bytes correctly", Arrays.equals(end,"blurfbazBarfoo".getBytes()), true);
+      assertTrue("Stream has written bytes correctly", Arrays.equals(end,"blurfbazBarfoo".getBytes()));
     } finally {
       rs.close();
     }
