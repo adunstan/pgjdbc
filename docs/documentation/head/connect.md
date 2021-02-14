@@ -544,13 +544,13 @@ Connection conn = DriverManager.getConnection(url);
 
 * **blobAsBytea** = boolean
 
-    When true, Blobs are treated as bytea fields, instead as Large Objects,
+    When true, Blobs are treated as bytea fields, instead of as Large Objects,
 
     By default blobAsBytea is false.
 
 * **clobAsText** = boolean
 
-    When true, Clobs are treated as text fields, instead as Large Objects,
+    When true, Clobs are treated as text fields, instead of as Large Objects,
 
     By default clobAsText is false.
 	
